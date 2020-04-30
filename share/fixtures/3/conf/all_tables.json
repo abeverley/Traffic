@@ -1,0 +1,21 @@
+{
+   "has_many" : {
+      "fetch" : 0
+   },
+   "might_have" : {
+      "fetch" : 0
+   },
+   "sets" : [
+      {
+         "class" : "Point",
+         "quantity" : "all"
+      },
+      {
+         "quantity" : "all",
+         "class" : "Subject"
+      }
+   ],
+   "belongs_to" : {
+      "fetch" : 0
+   }
+}

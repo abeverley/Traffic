@@ -47,7 +47,11 @@ get '/thumbnail/:id' => sub {
 get '/points' => sub {
     my @return;
     foreach my $point (schema->resultset('Point')->search({},{
-        columns => ['me.id', 'me.lat', 'me.long', 'me.comment', 'me.file_mimetype', 'me.thumbnail_width', 'me.thumbnail_height']
+        join => 'subject',
+        columns => [
+            'me.id', 'me.lat', 'me.long', 'me.comment', 'me.file_mimetype',
+            'me.thumbnail_width', 'me.thumbnail_height', 'me.subject_id', 'subject.title'
+        ]
     })->all)
     {
         push @return, {
@@ -64,6 +68,12 @@ get '/points' => sub {
         type     => "FeatureCollection",
         features => \@return,
     };
+};
+
+get '/subjects' => sub {
+    my @subjects = map $_->as_hash, schema->resultset('Subject')->all;
+    content_type 'application/json';
+    encode_json \@subjects;
 };
 
 post '/submit' => sub {
@@ -102,11 +112,13 @@ post '/submit' => sub {
         };
     }
 
-    $params->{lat}     = body_parameters->get('lat');
-    $params->{long}    = body_parameters->get('long');
-    $params->{comment} = body_parameters->get('comment');
+    $params->{subject_id} = body_parameters->get('subject_id') || undef;
+    $params->{lat}        = body_parameters->get('lat');
+    $params->{long}       = body_parameters->get('long');
+    $params->{comment}    = body_parameters->get('comment');
 
     my $point = schema->resultset('Point')->create($params);
+    $point->discard_changes;
 
     return encode_json $point->as_hash;
 };
