@@ -71,7 +71,9 @@ get '/points' => sub {
 };
 
 get '/subjects' => sub {
-    my @subjects = map $_->as_hash, schema->resultset('Subject')->all;
+    my @subjects = map $_->as_hash, schema->resultset('Subject')->search({},{
+        order_by => 'me.order',
+    })->all;
     content_type 'application/json';
     encode_json \@subjects;
 };
