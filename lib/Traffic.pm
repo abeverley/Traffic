@@ -46,7 +46,10 @@ get '/thumbnail/:id' => sub {
 
 get '/points' => sub {
     my @return;
-    foreach my $point (schema->resultset('Point')->search({},{
+    my $is_record = query_parameters->get('is_record') && query_parameters->get('is_record') eq 'true';
+    foreach my $point (schema->resultset('Point')->search({
+        'me.is_record' => $is_record ? 1 : 0,
+    },{
         join => 'subject',
         columns => [
             'me.id', 'me.lat', 'me.long', 'me.comment', 'me.file_mimetype',
@@ -68,6 +71,57 @@ get '/points' => sub {
         type     => "FeatureCollection",
         features => \@return,
     };
+};
+
+get '/wards' => sub {
+    content_type 'application/json';
+    encode_json [
+        map decode_json($_->kml), schema->resultset('Layer')->search({ type => 'ward' })->all
+    ];
+};
+
+get '/ward/:ward' => sub {
+    content_type 'application/json';
+    encode_json [
+        map decode_json($_->kml), schema->resultset('Layer')->search({ key => route_parameters->get('ward') })->all
+    ];
+};
+
+get '/clwn' => sub {
+    content_type 'application/json';
+    encode_json [
+        map decode_json($_->kml), schema->resultset('Layer')->search({ type => 'clwn' })->all
+    ];
+};
+
+get '/ltn' => sub {
+    content_type 'application/json';
+    encode_json [
+        map decode_json($_->kml), schema->resultset('Layer')->search({ type => 'ltn' })->all
+    ];
+};
+
+get '/improved' => sub {
+    content_type 'application/json';
+    encode_json [
+        map decode_json($_->kml), schema->resultset('Layer')->search({ type => 'improved' })->all
+    ];
+};
+
+get '/lightseg' => sub {
+    content_type 'application/json';
+    encode_json [
+        map decode_json($_->kml), schema->resultset('Layer')->search({ type => 'lightseg' })->all
+    ];
+};
+
+# http://polygons.openstreetmap.fr/get_geojson.py?id=51781&params=0
+my $file = path(setting('appdir'), 'outlines');
+my $outline = read_file("$file/westminster.geojson");
+
+get '/outline' => sub {
+    content_type 'application/json';
+    return $outline;
 };
 
 get '/subjects' => sub {
@@ -118,6 +172,7 @@ post '/submit' => sub {
     $params->{lat}        = body_parameters->get('lat');
     $params->{long}       = body_parameters->get('long');
     $params->{comment}    = body_parameters->get('comment');
+    $params->{is_record}  = body_parameters->get('is_record') ? 1 : 0;
 
     my $point = schema->resultset('Point')->create($params);
     $point->discard_changes;

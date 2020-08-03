@@ -40,6 +40,8 @@ __PACKAGE__->add_columns(
   { data_type => "integer", is_nullable => 1 },
   "thumbnail_height",
   { data_type => "integer", is_nullable => 1 },
+  "is_record",
+  { data_type => "smallint", is_nullable => 0, default => 0 },
 );
 
 __PACKAGE__->set_primary_key("id");

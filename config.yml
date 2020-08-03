@@ -28,7 +28,7 @@ plugins:
       dsn: dbi:mysql:database=traffic;mysql_enable_utf8=1;host=localhost
       schema_class: Traffic::Schema
       user: traffic
-      password: traffic
+      password: lUOIy1SvVVj18Dqy
       options:
         RaiseError: 1
         PrintError: 1
