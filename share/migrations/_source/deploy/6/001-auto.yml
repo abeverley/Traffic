@@ -1,0 +1,311 @@
+---
+schema:
+  procedures: {}
+  tables:
+    layer:
+      constraints:
+        - deferrable: 1
+          expression: ''
+          fields:
+            - id
+          match_type: ''
+          name: ''
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: PRIMARY KEY
+      fields:
+        id:
+          data_type: integer
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 0
+          name: id
+          order: 1
+          size:
+            - 0
+        key:
+          data_type: text
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: key
+          order: 2
+          size:
+            - 0
+        kml:
+          data_type: longtext
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: kml
+          order: 4
+          size:
+            - 0
+        type:
+          data_type: text
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: type
+          order: 3
+          size:
+            - 0
+      indices: []
+      name: layer
+      options: []
+      order: 1
+    point:
+      constraints:
+        - deferrable: 1
+          expression: ''
+          fields:
+            - id
+          match_type: ''
+          name: ''
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: PRIMARY KEY
+        - deferrable: 1
+          expression: ''
+          fields:
+            - subject_id
+          match_type: ''
+          name: point_fk_subject_id
+          on_delete: NO ACTION
+          on_update: NO ACTION
+          options: []
+          reference_fields:
+            - id
+          reference_table: subject
+          type: FOREIGN KEY
+      fields:
+        comment:
+          data_type: text
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: comment
+          order: 6
+          size:
+            - 0
+        file_content:
+          data_type: longblob
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: file_content
+          order: 10
+          size:
+            - 0
+        file_mimetype:
+          data_type: text
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: file_mimetype
+          order: 9
+          size:
+            - 0
+        file_name:
+          data_type: text
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: file_name
+          order: 8
+          size:
+            - 0
+        id:
+          data_type: integer
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 0
+          name: id
+          order: 1
+          size:
+            - 0
+        is_record:
+          data_type: smallint
+          default_value: ~
+          is_nullable: 0
+          is_primary_key: 0
+          is_unique: 0
+          name: is_record
+          order: 14
+          size:
+            - 0
+        lat:
+          data_type: decimal
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: lat
+          order: 3
+          size:
+            - 10
+            - 8
+        long:
+          data_type: decimal
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: long
+          order: 4
+          size:
+            - 10
+            - 8
+        postcode:
+          data_type: text
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: postcode
+          order: 5
+          size:
+            - 0
+        subject_id:
+          data_type: integer
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: subject_id
+          order: 7
+          size:
+            - 0
+        submitted:
+          data_type: datetime
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: submitted
+          order: 2
+          size:
+            - 0
+        thumbnail:
+          data_type: longblob
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: thumbnail
+          order: 11
+          size:
+            - 0
+        thumbnail_height:
+          data_type: integer
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: thumbnail_height
+          order: 13
+          size:
+            - 0
+        thumbnail_width:
+          data_type: integer
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: thumbnail_width
+          order: 12
+          size:
+            - 0
+      indices:
+        - fields:
+            - subject_id
+          name: point_idx_subject_id
+          options: []
+          type: NORMAL
+      name: point
+      options: []
+      order: 2
+    subject:
+      constraints:
+        - deferrable: 1
+          expression: ''
+          fields:
+            - id
+          match_type: ''
+          name: ''
+          on_delete: ''
+          on_update: ''
+          options: []
+          reference_fields: []
+          reference_table: ''
+          type: PRIMARY KEY
+      fields:
+        id:
+          data_type: integer
+          default_value: ~
+          is_auto_increment: 1
+          is_nullable: 0
+          is_primary_key: 1
+          is_unique: 0
+          name: id
+          order: 1
+          size:
+            - 0
+        order:
+          data_type: integer
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: order
+          order: 3
+          size:
+            - 0
+        title:
+          data_type: text
+          default_value: ~
+          is_nullable: 1
+          is_primary_key: 0
+          is_unique: 0
+          name: title
+          order: 2
+          size:
+            - 0
+      indices: []
+      name: subject
+      options: []
+      order: 3
+  triggers: {}
+  views: {}
+translator:
+  add_drop_table: 0
+  filename: ~
+  no_comments: 0
+  parser_args:
+    sources:
+      - Layer
+      - Point
+      - Subject
+  parser_type: SQL::Translator::Parser::DBIx::Class
+  producer_args: {}
+  producer_type: SQL::Translator::Producer::YAML
+  show_warnings: 0
+  trace: 0
+  version: 0.11024
