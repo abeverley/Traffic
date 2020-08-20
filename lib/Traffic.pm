@@ -207,6 +207,7 @@ post '/submit' => sub {
         }
         $params->{feedback}  = body_parameters->get('feedback');
         $params->{comment}   = body_parameters->get('comment');
+        $params->{postcode}  = body_parameters->get('postcode');
         $params->{point_id}  = body_parameters->get('point_id');
         my $comment = schema->resultset('Comment')->create($params);
         $comment->discard_changes;
