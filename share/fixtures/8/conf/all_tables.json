@@ -1,0 +1,29 @@
+{
+   "sets" : [
+      {
+         "class" : "Layer",
+         "quantity" : "all"
+      },
+      {
+         "quantity" : "all",
+         "class" : "Comment"
+      },
+      {
+         "class" : "Point",
+         "quantity" : "all"
+      },
+      {
+         "class" : "Subject",
+         "quantity" : "all"
+      }
+   ],
+   "might_have" : {
+      "fetch" : 0
+   },
+   "belongs_to" : {
+      "fetch" : 0
+   },
+   "has_many" : {
+      "fetch" : 0
+   }
+}

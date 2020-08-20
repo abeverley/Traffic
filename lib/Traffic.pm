@@ -50,11 +50,27 @@ get '/points' => sub {
     foreach my $point (schema->resultset('Point')->search({
         'me.is_record' => $is_record ? 1 : 0,
     },{
-        join => 'subject',
-        columns => [
-            'me.id', 'me.lat', 'me.long', 'me.comment', 'me.file_mimetype',
-            'me.thumbnail_width', 'me.thumbnail_height', 'me.subject_id', 'subject.title'
-        ]
+        join => ['subject','comments'],
+        select => [
+            'me.id',
+            { max => 'me.lat' },
+            { max => 'me.long' },
+            { max => 'me.comment' },
+            { max => 'me.file_mimetype' },
+            { max => 'me.is_record' },
+            { max => 'me.thumbnail_width'},
+            { max => 'me.thumbnail_height'},
+            { max => 'me.subject_id'},
+            { max => 'subject.title'},
+            { max => 'comments.id'},
+            { sum => \"CASE WHEN feedback='keep' THEN 1 ELSE 0 END" },
+            { sum => \"CASE WHEN feedback='improve' THEN 1 ELSE 0 END" },
+            { sum => \"CASE WHEN feedback='remove' THEN 1 ELSE 0 END" },
+        ],
+        as => [qw/id lat long comment file_mimetype is_record thumnail_width thumbnail_height
+            subject_id title comments_id
+            keep_count improve_count remove_count/],
+        group_by => 'me.id',
     })->all)
     {
         push @return, {
@@ -136,6 +152,13 @@ post '/submit' => sub {
 
     content_type 'application/json';
 
+    my $is_feedback = body_parameters->get('is_feedback');
+
+    return encode_json({
+        is_error => 1,
+        message  => 'Password provided is incorrect',
+    }) if !$is_feedback && body_parameters->get('password') ne config->{traffic}->{password};
+
     my $params;
 
     if (my $upload = upload('file'))
@@ -168,16 +191,38 @@ post '/submit' => sub {
         };
     }
 
-    $params->{subject_id} = body_parameters->get('subject_id') || undef;
-    $params->{lat}        = body_parameters->get('lat');
-    $params->{long}       = body_parameters->get('long');
-    $params->{comment}    = body_parameters->get('comment');
-    $params->{is_record}  = body_parameters->get('is_record') ? 1 : 0;
+    if (body_parameters->get('is_feedback'))
+    {
+        my $feedback = body_parameters->get('feedback');
+        return encode_json {
+            is_error => 1,
+            message  => "Please click a feedback option",
+        } if !$feedback;
+        if ($feedback !~ /^(keep|improve|remove)$/)
+        {
+            return encode_json {
+                is_error => 1,
+                message  => "Invalid feedback value: $feedback",
+            };
+        }
+        $params->{feedback}  = body_parameters->get('feedback');
+        $params->{comment}   = body_parameters->get('comment');
+        $params->{point_id}  = body_parameters->get('point_id');
+        my $comment = schema->resultset('Comment')->create($params);
+        $comment->discard_changes;
+        return encode_json $comment->as_hash;
+    }
+    else {
+        $params->{subject_id} = body_parameters->get('subject_id') || undef;
+        $params->{lat}        = body_parameters->get('lat');
+        $params->{long}       = body_parameters->get('long');
+        $params->{comment}    = body_parameters->get('comment');
+        $params->{is_record}  = body_parameters->get('is_record') ? 1 : 0;
+        my $point = schema->resultset('Point')->create($params);
+        $point->discard_changes;
+        return encode_json $point->as_hash;
+    }
 
-    my $point = schema->resultset('Point')->create($params);
-    $point->discard_changes;
-
-    return encode_json $point->as_hash;
 };
 
 true;

@@ -58,13 +58,34 @@ __PACKAGE__->belongs_to(
   },
 );
 
+__PACKAGE__->has_many(
+  "comments",
+  "Traffic::Schema::Result::Comment",
+  { "foreign.point_id" => "self.id" },
+  { cascade_copy => 0, cascade_delete => 1 },
+);
+
+sub sqlt_deploy_hook {
+    my ($self, $sqlt_table) = @_;
+    $sqlt_table->add_index(name => 'point_idx_is_record', fields => ['is_record']);
+}
+
 sub as_hash
 {   my $self = shift;
+    my $comment = encode_entities($self->comment);
+    $comment = "<h6>$comment</h6>" if $self->is_record;
+    my $feedback = $self->is_record && $self->has_column_loaded('keep_count') && {
+        keep    => $self->get_column('keep_count'),
+        improve => $self->get_column('improve_count'),
+        remove  => $self->get_column('remove_count'),
+    };
     return +{
-        html             => encode_entities($self->comment),
+        html             => $comment,
         subject          => encode_entities($self->subject ? $self->subject->title : ''),
         id               => $self->id,
         has_image        => !!$self->file_mimetype,
+        is_record        => $self->is_record,
+        feedback         => $feedback,
         thumbnail_width  => $self->thumbnail_width,
         thumbnail_height => $self->thumbnail_height,
     }

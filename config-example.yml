@@ -22,6 +22,9 @@ charset: "UTF-8"
 
 template: "template_toolkit"
 
+traffic:
+  password: XXX
+
 plugins:
   DBIC:
     default:
