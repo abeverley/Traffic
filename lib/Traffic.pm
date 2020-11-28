@@ -47,8 +47,10 @@ get '/thumbnail/:id' => sub {
 get '/points' => sub {
     my @return;
     my $is_record = query_parameters->get('is_record') && query_parameters->get('is_record') eq 'true';
+    my $is_pp = query_parameters->get('is_pp');
     foreach my $point (schema->resultset('Point')->search({
         'me.is_record' => $is_record ? 1 : 0,
+        'me.is_pp' => $is_pp ? 1 : 0,
     },{
         join => ['subject','comments'],
         select => [
@@ -82,6 +84,7 @@ get '/points' => sub {
               properties => $point->as_hash,
         };
     }
+    header "Access-Control-Allow-Origin" => "*";
     content_type 'application/json';
     encode_json {
         type     => "FeatureCollection",
@@ -133,15 +136,20 @@ get '/lightseg' => sub {
 
 # http://polygons.openstreetmap.fr/get_geojson.py?id=51781&params=0
 my $file = path(setting('appdir'), 'outlines');
-my $outline = read_file("$file/westminster.geojson");
+my $outlines = {
+    westminster => read_file("$file/westminster.geojson"),
+    pp          => read_file("$file/paddingtonplaces.geojson"),
+};
 
 get '/outline' => sub {
     content_type 'application/json';
-    return $outline;
+    return query_parameters->get('is_pp') ? $outlines->{pp} : $outlines->{westminster};
 };
 
 get '/subjects' => sub {
-    my @subjects = map $_->as_hash, schema->resultset('Subject')->search({},{
+    my @subjects = map $_->as_hash, schema->resultset('Subject')->search({
+        'me.type' => query_parameters->get('is_pp') ? 'pp' : undef,
+    },{
         order_by => 'me.order',
     })->all;
     content_type 'application/json';
@@ -151,13 +159,15 @@ get '/subjects' => sub {
 post '/submit' => sub {
 
     content_type 'application/json';
+    header "Access-Control-Allow-Origin" => "*";
 
     my $is_feedback = body_parameters->get('is_feedback');
+    my $is_pp = body_parameters->get('is_pp');
 
     return encode_json({
         is_error => 1,
         message  => 'Password provided is incorrect',
-    }) if !$is_feedback && body_parameters->get('password') ne config->{traffic}->{password};
+    }) if !$is_pp && !$is_feedback && body_parameters->get('password') ne config->{traffic}->{password};
 
     my $params;
 
@@ -219,6 +229,8 @@ post '/submit' => sub {
         $params->{long}       = body_parameters->get('long');
         $params->{comment}    = body_parameters->get('comment');
         $params->{is_record}  = body_parameters->get('is_record') ? 1 : 0;
+        $params->{is_pp}      = body_parameters->get('is_pp') ? 1 : 0;
+        $params->{postcode}  = body_parameters->get('postcode');
         my $point = schema->resultset('Point')->create($params);
         $point->discard_changes;
         return encode_json $point->as_hash;

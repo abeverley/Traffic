@@ -14,6 +14,8 @@ __PACKAGE__->add_columns(
   { data_type => "text", is_nullable => 1 },
   "order",
   { data_type => "integer", is_nullable => 1 },
+  "type",
+  { data_type => "varchar", is_nullable => 1, size => 16 },
 );
 
 __PACKAGE__->set_primary_key("id");
